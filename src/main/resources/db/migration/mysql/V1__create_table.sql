@@ -1,0 +1,6 @@
+-- Migration de exemplo (MySQL).
+CREATE TABLE IF NOT EXISTS alunos (
+    id    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome  VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE
+);
