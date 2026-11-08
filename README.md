@@ -4,11 +4,18 @@ Um boilerplate evolutivo desenvolvido para praticar operações de CRUD e consol
 
 ## 🚀 O que este projeto demonstra?
 * **CRUD Genérico:** Operações fundamentais de persistência (Create, Read, Update, Delete) isoladas da lógica principal.
-* **Arquitetura Desacoplada:** Uso do padrão *Repository/DAO* para isolar o acesso a dados através de interfaces.
+* **Arquitetura Desacoplada:** Uso do padrão *Repository* para isolar o acesso a dados através de interfaces.
 * **Linha de Aprendizado Real:** Evolução prática saindo do gerenciamento manual de conexões até a automação com frameworks de mercado.
 
 ## 🗺️ Roadmap de Evolução
 - [ ] **Fase 1 (Atual):** CRUD via JDBC puro com MySQL (Gerenciamento manual de conexões, PreparedStatements e SQL puro). 🚧
+    - [x] Conexão via `.env` + Flyway por `DB_TYPE`
+    - [ ] Entity `Aluno`
+    - [ ] `AlunoRepository` + `AlunoRepositoryJdbc` (CRUD)
+    - [ ] `AlunoService` com regras simples
+    - [ ] Datafaker para popular dados
+    - [ ] Postgres (`DB_TYPE=postgres`)
+    - [ ] Ao concluir: `git tag fase-jdbc`
 - [ ] **Fase 2:** CRUD via NoSQL (MongoDB) utilizando drivers nativos. ⏳
 - [ ] **Fase 3:** Migração para o ecossistema Spring Boot (Inversão de Controle, Spring Data JPA e Spring Data MongoDB). ⏳
 
@@ -27,14 +34,57 @@ Um boilerplate evolutivo desenvolvido para praticar operações de CRUD e consol
             abre a Connection              roda as migrations do Flyway
                     │                             │
                     ▼                             ▼
-          Main / DAOs (JDBC)            pasta db/migration/<DB_TYPE>
+        AlunoRepositoryJdbc (SQL)         pasta db/migration/<DB_TYPE>
+                    ▲
+                    │ implementa
+            AlunoRepository (interface)
+                    ▲
+                    │ usa
+              AlunoService  ◄── Main
 ```
 
-| Classe | Pacote | Responsabilidade |
+Fluxo: `Main → AlunoService → AlunoRepository (interface) → AlunoRepositoryJdbc → ConnectionFactory → DatabaseConfig → .env`
+
+## Estrutura de pacotes
+
+```
+br.com.dio
+ ├─ Main.java
+ ├─ config/        DatabaseConfig                      lê variáveis, monta a URL
+ ├─ database/      ConnectionFactory, MigrationRunner  abre conexão, roda Flyway
+ ├─ entity/        Aluno                               espelho da tabela
+ ├─ repository/    AlunoRepository (interface)         contrato do CRUD
+ │   └─ jdbc/      AlunoRepositoryJdbc                 implementação JDBC (SQL manual)
+ └─ service/       AlunoService                        regras de negócio
+```
+
+| Pacote | Responsabilidade | Sobrevive ao Spring/JPA? |
 |---|---|---|
-| `DatabaseConfig` | `br.com.dio.config` | Só lê as variáveis e monta a URL JDBC |
-| `ConnectionFactory` | `br.com.dio.config` | Só abre a conexão usando o config |
-| `MigrationRunner` | `br.com.dio.migration.MigrationRunner` | Só executa o Flyway usando o config |
+| `config` | Ler variáveis e montar a URL | Não (vira `application.yml`) |
+| `database` | Conexão e migrations em código | Não (Spring assume) |
+| `entity` | Dados da tabela, sem SQL | **Sim** (ganha `@Entity`) |
+| `repository` | Acesso a dados, atrás de interface | Interface sim, implementação troca |
+| `service` | Regras de negócio, sem SQL | **Sim** |
+
+### Regras do projeto
+
+- SQL fica **somente** na implementação do repositório. Nunca no service nem na entity.
+- O service depende da **interface**, nunca da implementação.
+- A entity usa `Long id` (nulo antes de salvar), construtor sem argumentos, getters e setters (Lombok). Sem anotações JPA enquanto o projeto for JDBC.
+- Migrations (`db/migration/<DB_TYPE>`) não mudam na migração para Spring.
+
+## Implementações de repositório
+
+| Implementação | Status | Observação |
+|---|---|---|
+| `repository/jdbc/AlunoRepositoryJdbc` | Ativa (Fase 1) | SQL manual com `PreparedStatement` |
+| `repository/mongo/AlunoRepositoryMongo` | Planejada (Fase 2) | Driver nativo do MongoDB |
+| `repository/jpa/AlunoRepositoryJpa` | Planejada (Fase 3) | Spring Data JPA |
+
+Ao migrar para Spring (Fase 3):
+- `config/` e `database/` deixam de ser usados.
+- `entity/`, `service/` e as migrations permanecem.
+- As implementações anteriores ficam como referência, **sem serem registradas como bean** (sem `@Repository`/`@Component`).
 
 ## Variáveis de ambiente (.env)
 

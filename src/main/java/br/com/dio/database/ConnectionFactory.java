@@ -1,4 +1,6 @@
-package br.com.dio.config;
+package br.com.dio.database;
+
+import br.com.dio.config.DatabaseConfig;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

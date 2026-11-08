@@ -1,8 +1,8 @@
 package br.com.dio;
 
-import br.com.dio.config.ConnectionFactory;
+import br.com.dio.database.ConnectionFactory;
 import br.com.dio.config.DatabaseConfig;
-import br.com.dio.migration.MigrationRunner;
+import br.com.dio.database.MigrationRunner;
 
 import java.sql.Connection;
 import java.sql.SQLException;

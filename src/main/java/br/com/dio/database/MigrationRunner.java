@@ -1,4 +1,4 @@
-package br.com.dio.migration;
+package br.com.dio.database;
 
 import br.com.dio.config.DatabaseConfig;
 import org.flywaydb.core.Flyway;
