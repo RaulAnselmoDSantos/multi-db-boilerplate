@@ -1,16 +1,25 @@
 package br.com.dio;
 
+import br.com.dio.config.ConnectionFactory;
+import br.com.dio.config.DatabaseConfig;
+import br.com.dio.migration.MigrationRunner;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Main {
 
     public static void main(String[] args) throws SQLException {
-        ConnectionUtil db = new ConnectionUtil();
 
-        MigrationRunner.run(db);
+        DatabaseConfig config = new DatabaseConfig();
+        ConnectionFactory factory = new ConnectionFactory(config);
 
-        try (Connection connection = db.getConnection()) {
+        System.out.println("Connecting to database...");
+
+
+        MigrationRunner.run(config);
+
+        try (Connection connection = factory.getConnection()) {
             if (connection.isValid(5)) {
                 System.out.println("Conexão OK");
             }
