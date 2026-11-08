@@ -53,3 +53,17 @@ application {
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
+
+// Lê o arquivo .env (se existir) e repassa as variáveis para o ./gradlew run
+tasks.named<JavaExec>("run") {
+    val envFile = file(".env")
+    if (envFile.exists()) {
+        envFile.readLines()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
+            .forEach { linha ->
+                val (chave, valor) = linha.split("=", limit = 2)
+                environment(chave.trim(), valor.trim())
+            }
+    }
+}
