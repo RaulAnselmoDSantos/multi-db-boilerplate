@@ -8,10 +8,12 @@ public class MigrationRunner {
     private MigrationRunner() {}
 
     public static void run(DatabaseConfig config){
-        Flyway.configure()
+        Flyway flyway = Flyway.configure()
                 .dataSource(config.getUrl(), config.getUser(), config.getPassword())
                 .locations(config.getMigrationLocation())
-                .load()
-                .migrate();
+                .cleanDisabled(true)   // por segurança
+                .load();
+        //flyway.clean();
+        flyway.migrate();
     }
 }
