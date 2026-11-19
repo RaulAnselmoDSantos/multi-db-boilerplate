@@ -48,7 +48,25 @@ public class EmployeeRepositoryJdbc implements EmployeeRepository {
 
     @Override
     public void update(EmployeeEntity entity) {
+        var sql = "UPDATE employee SET nome = ?, email = ?, salary = ?, birth_date = ?  WHERE id = ?";
+        try (
+                var connection = factory.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql);
+        ){
 
+            ps.setString(1, entity.getNome());
+            ps.setString(2, entity.getEmail());
+            ps.setBigDecimal(3, entity.getSalary());
+            ps.setObject(4, entity.getBirthDate());
+            ps.setLong(5, entity.getId());
+
+            if (ps.executeUpdate() == 0) {
+                throw new RuntimeException("Employee with id " + entity.getId() + " not found");
+            }
+
+        }catch (SQLException ex) {
+            throw new RuntimeException("Error with Update in Employee", ex);
+        }
     }
 
     @Override
