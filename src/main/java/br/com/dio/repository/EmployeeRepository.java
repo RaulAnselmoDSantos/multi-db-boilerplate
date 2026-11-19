@@ -19,5 +19,12 @@ public interface EmployeeRepository {
     void update(final EmployeeEntity entity);
     void delete(final long id);
     Optional<EmployeeEntity> findById(final long id);
-    List<EmployeeEntity> findAll();
+
+    /**
+     * Lista employees paginados, ordenados por id.
+     *
+     * @param page número da página, começando em 0
+     * @param size quantidade por página (entre 1 e 100)
+     */
+    List<EmployeeEntity> findAll(int page, int size);
 }
