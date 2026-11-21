@@ -11,9 +11,9 @@ public class MigrationRunner {
         Flyway flyway = Flyway.configure()
                 .dataSource(config.getUrl(), config.getUser(), config.getPassword())
                 .locations(config.getMigrationLocation())
-                .cleanDisabled(true)   // por segurança
+                .cleanDisabled(false)   // por segurança
                 .load();
-        //flyway.clean();
+        flyway.clean();
         flyway.migrate();
     }
 }

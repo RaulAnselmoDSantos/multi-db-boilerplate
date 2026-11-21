@@ -5,4 +5,3 @@ CREATE TABLE IF NOT EXISTS employee (
     salary     DECIMAL(10,2) NOT NULL,
     birth_date DATETIME      NOT NULL
 );
-
